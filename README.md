@@ -58,3 +58,4 @@ QuanLyThiSinh_TuNhap_3Nguoi/
 - Thứ tự các thẻ `<script>` cuối `index.html` phải giữ đúng như hiện tại.
 - Dữ liệu không được chia sẻ giữa các máy, vì đây là bài tập web thuần HTML/CSS/JS.
 - Có thêm file `index_1_file.html` trong thư mục dự án: bản chạy độc lập một file, với phân công ghi trong chú thích mã nguồn (không xuất hiện trên giao diện).
+
