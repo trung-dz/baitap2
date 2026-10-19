@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+  PHÂN CÔNG CÔNG VIỆC NHÓM (CHỈ GHI TRONG MÃ NGUỒN, KHÔNG HIỂN THỊ TRÊN WEBSITE)
+  1. PHẠM GIA HUY: Lớp ThiSinh và lớp khối A/B/C; kiểm tra và thêm thí sinh.
+     File phụ trách: js/models.js, js/add.js.
+  2. VŨ TẤN TÀI: Hiển thị danh sách, khối và môn thi; tìm theo số báo danh.
+     File phụ trách: js/display.js, js/search.js.
+  3. TRƯƠNG THÀNH TRUNG: Lưu trữ, thống kê, thoát/vào lại, giao diện, tích hợp.
+     File phụ trách: js/storage.js, js/app.js, index.html, style.css.
+  Ghi chú: Để xem phần phân công, mở file bằng Visual Studio Code và xem mã nguồn.
+-->
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Hệ thống quản lý thí sinh dự thi đại học khối A, B, C" />
+  <title>Quản lý thí sinh dự thi đại học</title>
+  <!-- TRƯƠNG THÀNH TRUNG: Thiết kế giao diện website -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- TRƯƠNG THÀNH TRUNG: Thanh điều hướng & thoát -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-icon">TS</div>
+          <div>
+            <h1>Quản lý thí sinh đại học</h1>
+            <span>Hệ thống quản lý tuyển sinh • Khối A, B, C</span>
+          </div>
+        </div>
+        <button id="btnExit" type="button" class="exit-button">↪ Thoát</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="heading">
+        <div>
+          <p class="eyebrow">BẢNG ĐIỀU KHIỂN</p>
+          <h2>Quản lý danh sách thí sinh</h2>
+          <p>Thêm hồ sơ, xem danh sách và tìm kiếm thí sinh theo số báo danh.</p>
+        </div>
+        <div class="year-badge">● 3 khối thi A · B · C</div>
+      </div>
+
+      <!-- TRƯƠNG THÀNH TRUNG: Khu vực thống kê số lượng theo khối -->
+      <section class="stats" aria-label="Thống kê thí sinh">
+        <div class="stat"><div class="stat-top"><span class="stat-label">Tổng thí sinh</span><span class="stat-icon purple">∑</span></div><div id="totalCount" class="stat-value">0</div><div class="stat-note">Hồ sơ đã lưu</div></div>
+        <div class="stat"><div class="stat-top"><span class="stat-label">Khối A</span><span class="stat-icon blue">A</span></div><div id="countA" class="stat-value">0</div><div class="stat-note">Toán · Lý · Hoá</div></div>
+        <div class="stat"><div class="stat-top"><span class="stat-label">Khối B</span><span class="stat-icon green">B</span></div><div id="countB" class="stat-value">0</div><div class="stat-note">Toán · Hoá · Sinh</div></div>
+        <div class="stat"><div class="stat-top"><span class="stat-label">Khối C</span><span class="stat-icon orange">C</span></div><div id="countC" class="stat-value">0</div><div class="stat-note">Văn · Sử · Địa</div></div>
+      </section>
+
+      <div class="layout">
+        <!-- PHẠM GIA HUY: Biểu mẫu thêm mới thí sinh -->
+        <section class="panel" aria-labelledby="formTitle">
+          <div class="panel-header"><h3 id="formTitle">✚ Thêm thí sinh mới</h3><p>Tự nhập số báo danh, họ tên và địa chỉ của thí sinh.</p></div>
+          <div class="form-body">
+            <!-- PHẠM GIA HUY: Người dùng tự nhập thông tin, không đặt sẵn giá trị cố định. -->
+            <form id="studentForm" novalidate>
+              <p class="input-note">✎ Bạn có thể nhập thông tin bất kỳ; số báo danh không được trùng.</p>
+              <div class="field"><label for="soBaoDanh">Số báo danh <span class="req">*</span></label><input id="soBaoDanh" type="text" placeholder="Nhập số báo danh bạn tự chọn" maxlength="30" autocomplete="off" spellcheck="false" required /></div>
+              <div class="field"><label for="hoTen">Họ và tên <span class="req">*</span></label><input id="hoTen" type="text" placeholder="Nhập họ và tên thí sinh" maxlength="100" autocomplete="off" required /></div>
+              <div class="field"><label for="diaChi">Địa chỉ <span class="req">*</span></label><input id="diaChi" type="text" placeholder="Nhập địa chỉ thí sinh" maxlength="200" autocomplete="off" required /></div>
+              <div class="field-row">
+                <div class="field"><label for="mucUuTien">Mức ưu tiên <span class="req">*</span></label><select id="mucUuTien" required><option value="">Chọn mức</option><option value="1">Mức 1</option><option value="2">Mức 2</option><option value="3">Mức 3</option><option value="Không">Không ưu tiên</option></select></div>
+                <div class="field"><label for="khoiThi">Khối thi <span class="req">*</span></label><select id="khoiThi" required><option value="">Chọn khối</option><option value="A">Khối A</option><option value="B">Khối B</option><option value="C">Khối C</option></select></div>
+              </div>
+              <div id="subjectPreview" class="subject-preview">Chọn khối thi để xem các môn dự thi.</div>
+              <div class="form-actions"><button class="btn btn-primary" type="submit">＋ Thêm thí sinh</button><button class="btn btn-muted" type="reset">Nhập lại</button></div>
+              <div id="notice" role="status" aria-live="polite" hidden></div>
+            </form>
+          </div>
+        </section>
+
+        <!-- VŨ TẤN TÀI: Bảng danh sách và công cụ tìm kiếm -->
+        <section class="panel" aria-labelledby="listTitle">
+          <div class="list-top"><h3 id="listTitle">☷ Danh sách thí sinh</h3><p>Thông tin thí sinh và các môn thi theo từng khối.</p>
+            <div class="searchbar">
+              <input type="search" id="searchSBD" aria-label="Tìm số báo danh" placeholder="Nhập số báo danh cần tìm..." maxlength="30" autocomplete="off" />
+              <button id="btnSearch" type="button" class="btn btn-primary">⌕ Tìm kiếm</button>
+              <button id="btnShowAll" type="button" class="btn btn-muted">Hiển thị tất cả</button>
+            </div>
+          </div>
+          <div id="tableWrap" class="table-wrap" hidden>
+            <table>
+              <thead><tr><th>Số báo danh</th><th>Thí sinh</th><th>Địa chỉ</th><th>Ưu tiên</th><th>Khối thi</th><th>Môn thi</th></tr></thead>
+              <tbody id="studentRows"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="empty"><div class="empty-icon">▤</div><h4 id="emptyTitle">Chưa có thí sinh nào</h4><p id="emptyDescription">Hãy thêm thí sinh đầu tiên bằng biểu mẫu bên trái.</p></div>
+          <div class="list-footer" id="resultSummary">Đang hiển thị 0 thí sinh</div>
+        </section>
+      </div>
+    </main>
+    <footer class="help">Dữ liệu được lưu trên trình duyệt này bằng localStorage. Không cần kết nối Internet.</footer>
+  </div>
+
+  <section id="exitScreen" class="exit-screen" hidden>
+    <div class="exit-card"><div class="exit-mark">✓</div><h2>Đã thoát chương trình</h2><p>Phiên làm việc đã kết thúc. Danh sách thí sinh vẫn được lưu trên trình duyệt này.</p><button id="btnReturn" class="btn btn-primary" type="button">Vào lại chương trình →</button></div>
+  </section>
+
+  <!-- THỨ TỰ TẢI FILE LÀ QUAN TRỌNG: Models -> Storage -> UI -> App -->
+  <!-- PHẠM GIA HUY: Các lớp thí sinh (OOP) -->
+  <script src="js/models.js"></script>
+  <!-- TRƯƠNG THÀNH TRUNG: Lớp quản lý và lưu trữ dữ liệu -->
+  <script src="js/storage.js"></script>
+  <!-- VŨ TẤN TÀI: Hiển thị danh sách, tìm kiếm -->
+  <script src="js/display.js"></script>
+  <script src="js/search.js"></script>
+  <!-- PHẠM GIA HUY: Thêm thí sinh và kiểm tra dữ liệu nhập -->
+  <script src="js/add.js"></script>
+  <!-- TRƯƠNG THÀNH TRUNG: Thống kê, thoát, kết nối các thành phần -->
+  <script src="js/app.js"></script>
+</body>
+</html>
